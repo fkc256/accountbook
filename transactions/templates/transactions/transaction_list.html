@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}거래 내역{% endblock %}
+{% block content %}
+<!-- 필터 카드 -->
+<div class="filter-card mb-3 fade-in-up">
+    <form method="get">
+        <div class="row g-2 align-items-end">
+            <div class="col-6 col-md-2">
+                <label class="form-label">시작일</label>
+                <input type="date" name="date_from" class="form-control form-control-sm" value="{{ params.date_from|default:'' }}">
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label">종료일</label>
+                <input type="date" name="date_to" class="form-control form-control-sm" value="{{ params.date_to|default:'' }}">
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label">계좌</label>
+                <select name="account" class="form-select form-select-sm">
+                    <option value="">전체</option>
+                    {% for a in accounts %}
+                    <option value="{{ a.pk }}" {% if params.account == a.pk|stringformat:"d" %}selected{% endif %}>{{ a.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label">카테고리</label>
+                <select name="category" class="form-select form-select-sm">
+                    <option value="">전체</option>
+                    {% for c in categories %}
+                    <option value="{{ c.pk }}" {% if params.category == c.pk|stringformat:"d" %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-4 col-md-1">
+                <label class="form-label">구분</label>
+                <select name="tx_type" class="form-select form-select-sm">
+                    <option value="">전체</option>
+                    <option value="IN" {% if params.tx_type == "IN" %}selected{% endif %}>입금</option>
+                    <option value="OUT" {% if params.tx_type == "OUT" %}selected{% endif %}>출금</option>
+                </select>
+            </div>
+            <div class="col-5 col-md-2">
+                <label class="form-label">검색</label>
+                <input type="text" name="q" class="form-control form-control-sm" value="{{ params.q|default:'' }}" placeholder="메모/가맹점">
+            </div>
+            <div class="col-3 col-md-1">
+                <button type="submit" class="btn btn-primary btn-sm w-100">조회</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 거래 테이블 카드 -->
+<div class="card fade-in-up delay-1">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="page-title">거래 내역</span>
+        <a href="{% url 'transaction_create' %}" class="btn btn-primary btn-sm press-effect">+ 거래 추가</a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>거래일</th>
+                        <th>계좌</th>
+                        <th>구분</th>
+                        <th class="text-end">금액</th>
+                        <th>카테고리</th>
+                        <th>가맹점</th>
+                        <th class="text-end">잔액</th>
+                        <th>메모</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for tx in transactions %}
+                    <tr>
+                        <td>{{ tx.occurred_at }}</td>
+                        <td>{{ tx.account.name }}</td>
+                        <td>
+                            {% if tx.get_tx_type_display == "입금" %}
+                            <span class="badge bg-success-subtle text-success rounded-pill">입금</span>
+                            {% else %}
+                            <span class="badge bg-danger-subtle text-danger rounded-pill">출금</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end fw-semibold {% if tx.get_tx_type_display == '입금' %}text-amount-in{% else %}text-amount-out{% endif %}">{{ tx.amount|intcomma }}원</td>
+                        <td>{{ tx.category|default:"-" }}</td>
+                        <td>{{ tx.merchant|default:"-" }}</td>
+                        <td class="text-end">{% if tx.balance_after is not None %}{{ tx.balance_after|intcomma }}원{% else %}-{% endif %}</td>
+                        <td><a href="{% url 'transaction_detail' tx.pk %}" class="text-decoration-none">{{ tx.memo|default:"(상세)" }}</a></td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="8" class="text-center text-secondary py-4">거래 내역이 없습니다.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

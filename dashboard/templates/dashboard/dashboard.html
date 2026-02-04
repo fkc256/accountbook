@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}대시보드{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 fade-in-up">
+    <h4 class="page-title mb-0">{{ year }}년 {{ month }}월 대시보드</h4>
+    <form method="get" class="d-flex gap-2 align-items-center">
+        <input type="month" name="month" class="form-control form-control-sm" style="width:auto;" value="{{ month_param }}">
+        <button type="submit" class="btn btn-primary btn-sm press-effect">조회</button>
+    </form>
+</div>
+
+<!-- 요약 카드 3개 -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4 fade-in-up delay-1">
+        <div class="summary-card">
+            <div class="label">총 수입</div>
+            <div class="value income">{{ total_income|intcomma }}원</div>
+        </div>
+    </div>
+    <div class="col-md-4 fade-in-up delay-2">
+        <div class="summary-card">
+            <div class="label">총 지출</div>
+            <div class="value expense">{{ total_expense|intcomma }}원</div>
+        </div>
+    </div>
+    <div class="col-md-4 fade-in-up delay-3">
+        <div class="summary-card">
+            <div class="label">순합계</div>
+            <div class="value net">{{ net|intcomma }}원</div>
+        </div>
+    </div>
+</div>
+
+<!-- 카테고리별 합계 -->
+<div class="card fade-in-up delay-3">
+    <div class="card-header page-title">카테고리별 합계</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>카테고리</th>
+                        <th class="text-end">금액</th>
+                        <th style="width:50%">비율</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for item in category_summary %}
+                    {% widthratio item.total max_cat_total 100 as bar_width %}
+                    <tr>
+                        <td class="fw-semibold">{{ item.category__name|default:"미분류" }}</td>
+                        <td class="text-end">{{ item.total|intcomma }}원</td>
+                        <td>
+                            <div class="progress">
+                                <div class="progress-bar" style="width:{{ bar_width }}%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3" class="text-center text-secondary py-4">해당 월 거래 데이터가 없습니다.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

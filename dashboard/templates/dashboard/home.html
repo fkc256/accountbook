@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}홈{% endblock %}
+{% block content %}
+
+<!-- 화면 중앙 정렬 래퍼 -->
+<div class="home-wrapper">
+
+    <!-- 큰 타이틀 (애니메이션) -->
+    <div class="home-hero fade-in-up">
+        <h1 class="home-title">AccountBook</h1>
+        <p class="home-subtitle fade-in-up delay-1">나의 스마트 가계부</p>
+    </div>
+
+    <!-- 메뉴 아이콘 그리드 -->
+    <div class="home-menu">
+        <a href="{% url 'transaction_create' %}" class="home-menu-item press-effect fade-in-up delay-1">
+            <div class="home-icon" style="background: var(--primary-light); color: var(--primary);">
+                <i class="bi bi-plus-circle-fill"></i>
+            </div>
+            <span class="home-menu-label">거래 추가</span>
+        </a>
+        <a href="{% url 'dashboard' %}" class="home-menu-item press-effect fade-in-up delay-2">
+            <div class="home-icon" style="background: rgba(102, 187, 106, .12); color: var(--success);">
+                <i class="bi bi-speedometer2"></i>
+            </div>
+            <span class="home-menu-label">대시보드</span>
+        </a>
+        <a href="{% url 'account_list' %}" class="home-menu-item press-effect fade-in-up delay-2">
+            <div class="home-icon" style="background: rgba(124, 77, 255, .10); color: var(--accent);">
+                <i class="bi bi-wallet2"></i>
+            </div>
+            <span class="home-menu-label">계좌 관리</span>
+        </a>
+        <a href="{% url 'transaction_list' %}" class="home-menu-item press-effect fade-in-up delay-3">
+            <div class="home-icon" style="background: rgba(239, 83, 80, .10); color: var(--danger);">
+                <i class="bi bi-receipt"></i>
+            </div>
+            <span class="home-menu-label">거래 내역</span>
+        </a>
+        <a href="{% url 'recurring_list' %}" class="home-menu-item press-effect fade-in-up delay-3">
+            <div class="home-icon" style="background: rgba(255, 167, 38, .12); color: var(--warning);">
+                <i class="bi bi-arrow-repeat"></i>
+            </div>
+            <span class="home-menu-label">정기 거래</span>
+        </a>
+        <a href="{% url 'inmoney' %}" class="home-menu-item press-effect fade-in-up delay-4">
+            <div class="home-icon" style="background: rgba(94, 53, 177, .10); color: var(--primary);">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <span class="home-menu-label">InMoney</span>
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

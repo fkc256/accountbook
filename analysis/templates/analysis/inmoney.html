@@ -1,0 +1,815 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}InMoney{% endblock %}
+
+{% block content %}
+<style>
+/* ── InMoney 전용 스타일 ── */
+
+/* 헤더 */
+.im-header {
+    background: linear-gradient(135deg, #1A0A3E 0%, #311B92 100%);
+    color: #fff;
+    padding: 2rem 2.5rem;
+    border-radius: 16px 16px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.im-header h1 { margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: 2px; }
+.im-header .subtitle { font-size: .85rem; opacity: .7; margin-top: .25rem; }
+
+/* 도넛 점수 */
+.score-donut {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.score-donut-inner {
+    width: 68px; height: 68px;
+    border-radius: 50%;
+    background: #1A0A3E;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #fff;
+}
+.score-donut-inner .num { font-size: 1.5rem; font-weight: 800; line-height: 1; }
+.score-donut-inner .grade { font-size: .8rem; opacity: .8; }
+
+/* 서브 헤더 */
+.im-subheader {
+    background: #5E35B1;
+    color: #fff;
+    display: flex;
+    justify-content: space-around;
+    padding: .75rem 1.5rem;
+    font-size: .75rem;
+    flex-wrap: wrap;
+    gap: .25rem;
+}
+.im-subheader .item { text-align: center; min-width: 80px; }
+.im-subheader .val { font-size: 1.1rem; font-weight: 700; }
+
+/* 섹션 카드 */
+.im-sec {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(30, 10, 60, .06), 0 1px 2px rgba(30, 10, 60, .04);
+    padding: 1.25rem 1.5rem;
+    height: 100%;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.im-sec:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(30, 10, 60, .10);
+}
+.im-sec-title {
+    font-size: .85rem;
+    font-weight: 700;
+    color: #5E35B1;
+    border-bottom: 2px solid #5E35B1;
+    padding-bottom: .25rem;
+    margin-bottom: .75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* 통계 행 */
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    font-size: .85rem;
+}
+.stat-row .label { color: #616161; }
+.stat-row .val { font-weight: 600; }
+.stat-big { font-size: 1.6rem; font-weight: 800; margin: .25rem 0; }
+
+/* 가로 막대 */
+.hbar { margin: 5px 0; }
+.hbar-label {
+    font-size: .78rem;
+    color: #424242;
+    margin-bottom: 2px;
+    display: flex;
+    justify-content: space-between;
+}
+.hbar-track {
+    height: 16px;
+    background: #f0f0f0;
+    border-radius: 7px;
+    overflow: hidden;
+}
+.hbar-fill {
+    height: 100%;
+    border-radius: 7px;
+    min-width: 2px;
+}
+
+/* 세로 막대 추이 */
+.trend {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 100px;
+    margin: 8px 0 2px 0;
+}
+.trend-col {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end;
+    height: 100%; min-width: 0;
+}
+.trend-bar {
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+    min-height: 1px;
+}
+.trend-labels {
+    display: flex; gap: 3px; margin-bottom: 6px;
+}
+.trend-labels span {
+    flex: 1; text-align: center;
+    font-size: .65rem; color: #9e9e9e;
+    min-width: 0; overflow: hidden;
+}
+
+/* 파이 (도넛) */
+.pie-wrap {
+    display: flex; align-items: center; gap: 12px; margin: 8px 0;
+}
+.pie {
+    width: 90px; height: 90px;
+    border-radius: 50%; flex-shrink: 0;
+}
+.pie-sm { width: 72px; height: 72px; }
+.legend { font-size: .78rem; }
+.legend-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+/* 복합 추이 (수입/지출) */
+.trend-dual {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 110px;
+    margin: 8px 0 2px 0;
+}
+.trend-pair {
+    flex: 1; display: flex; gap: 1px;
+    align-items: flex-end; height: 100%; min-width: 0;
+}
+.trend-pair div {
+    flex: 1; border-radius: 3px 3px 0 0; min-height: 1px;
+}
+
+/* 경고 */
+.warn-list { list-style: none; padding: 0; margin: 4px 0; }
+.warn-list li {
+    font-size: .75rem; padding: .35rem .75rem;
+    background: #fff3e0;
+    border-left: 3px solid #ff9800;
+    margin-bottom: 4px;
+    border-radius: 0 6px 6px 0;
+}
+.warn-ok {
+    font-size: .75rem; padding: .35rem .75rem;
+    background: #e8f5e9;
+    border-left: 3px solid #4caf50;
+    border-radius: 0 6px 6px 0;
+    color: #2e7d32;
+}
+
+/* 프로그레스 */
+.prog-wrap { margin: 6px 0; }
+.prog-label {
+    display: flex; justify-content: space-between;
+    font-size: .72rem; margin-bottom: 2px;
+}
+.prog-track {
+    height: 12px; background: #f0f0f0;
+    border-radius: 6px; overflow: hidden;
+}
+.prog-fill { height: 100%; border-radius: 6px; }
+
+/* 종합 요약 그리드 */
+.im-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    text-align: center;
+    margin: 8px 0;
+}
+.im-summary-item .val { font-size: 1.5rem; font-weight: 800; }
+.im-summary-item .desc { font-size: .75rem; color: #757575; }
+
+/* 푸터 */
+.im-footer {
+    background: #263238;
+    color: #90a4ae;
+    text-align: center;
+    padding: .75rem;
+    font-size: .65rem;
+    border-radius: 0 0 16px 16px;
+}
+
+/* GPT 섹션 — 카드 */
+.im-gpt {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(30, 10, 60, .06), 0 1px 2px rgba(30, 10, 60, .04);
+    padding: 2rem 2rem;
+    margin-top: 1.5rem;
+    border-top: 4px solid #5E35B1;
+}
+
+/* GPT 헤더 (아이콘 + 제목) */
+.im-gpt-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+.im-gpt-icon {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5E35B1 0%, #7C4DFF 100%);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+.im-gpt h2 { margin: 0; font-size: 1.15rem; color: #5E35B1; font-weight: 700; }
+.im-gpt-desc { margin: .15rem 0 0; font-size: .82rem; color: #757575; }
+
+/* GPT 버튼 */
+.im-gpt-btn {
+    padding: .75rem 2rem;
+    font-size: .95rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #5E35B1 0%, #7C4DFF 100%);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: .2s ease;
+    display: inline-flex;
+    align-items: center;
+}
+.im-gpt-btn:hover { background: linear-gradient(135deg, #4527A0 0%, #5E35B1 100%); }
+.im-gpt-btn:disabled { opacity: .5; cursor: default; }
+
+/* GPT 로딩 */
+.im-gpt-loading {
+    margin-top: 1.25rem;
+}
+.im-gpt-loading-text {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-size: .85rem;
+    color: #5E35B1;
+    margin-bottom: .6rem;
+}
+.im-gpt-spinner {
+    width: 18px; height: 18px;
+    border: 2.5px solid #E8E4EF;
+    border-top-color: #5E35B1;
+    border-radius: 50%;
+    animation: imSpin .7s linear infinite;
+}
+@keyframes imSpin {
+    to { transform: rotate(360deg); }
+}
+.im-gpt-loading-bar {
+    width: 100%; height: 4px;
+    background: #E8E4EF;
+    border-radius: 2px;
+    overflow: hidden;
+}
+.im-gpt-loading-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #5E35B1, #7C4DFF);
+    border-radius: 2px;
+    animation: imLoading 1.5s ease-in-out infinite;
+}
+@keyframes imLoading {
+    0%   { width: 10%; margin-left: 0; }
+    50%  { width: 40%; margin-left: 30%; }
+    100% { width: 10%; margin-left: 90%; }
+}
+
+/* GPT 결과 */
+.im-gpt-result {
+    margin-top: 1.25rem;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #E8E4EF;
+}
+.im-gpt-result-header {
+    background: linear-gradient(135deg, #5E35B1 0%, #7C4DFF 100%);
+    color: #fff;
+    font-size: .85rem;
+    font-weight: 600;
+    padding: .6rem 1.25rem;
+}
+.im-gpt-result-body {
+    padding: 1.5rem;
+    background: #f8f6fb;
+    white-space: pre-wrap;
+    line-height: 1.8;
+    font-size: .9rem;
+    color: #1A1225;
+}
+
+/* GPT 에러 */
+.im-gpt-error {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    margin-top: 1rem;
+    padding: 1rem 1.25rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    color: #dc2626;
+    font-size: .85rem;
+}
+
+/* 인쇄 */
+@media print {
+    body { margin: 0; }
+    .im-gpt { display: none; }
+    .navbar, main.container { padding: 0; }
+}
+</style>
+
+<!-- ══════════════════════════════════════ -->
+<!-- 헤더 + 서브헤더 -->
+<!-- ══════════════════════════════════════ -->
+<div class="im-header fade-in-up">
+    <div>
+        <h1>InMoney</h1>
+        <div class="subtitle">재무 건강 진단 보고서 &mdash; {{ today }}</div>
+    </div>
+    <div style="text-align:center;">
+        <div class="score-donut"
+             style="background:conic-gradient({{ score_color }} 0% {{ financial_score }}%, rgba(255,255,255,.15) {{ financial_score }}% 100%);">
+            <div class="score-donut-inner">
+                <span class="num">{{ financial_score }}</span>
+                <span class="grade">{{ grade }}등급</span>
+            </div>
+        </div>
+        <div style="font-size:.65rem; margin-top:4px; opacity:.7;">재무 건강 점수</div>
+    </div>
+</div>
+
+<div class="im-subheader fade-in-up delay-1">
+    <div class="item"><div class="val">{{ total_income|intcomma }}원</div>총 수입</div>
+    <div class="item"><div class="val">{{ total_expense|intcomma }}원</div>총 지출</div>
+    <div class="item"><div class="val">{{ net|intcomma }}원</div>잔여</div>
+    <div class="item"><div class="val">{{ saving_rate }}%</div>저축률</div>
+    <div class="item"><div class="val">{{ cash_endurance_months }}개월</div>현금 체력</div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- 본문 섹션 그리드 -->
+<!-- ══════════════════════════════════════ -->
+<div class="row g-3 mt-1 fade-in-up delay-2">
+
+    <!-- ① 수입·지출 구조 -->
+    <div class="col-lg-4 col-md-6">
+        <div class="im-sec">
+            <div class="im-sec-title">1. 수입·지출 구조</div>
+            <div class="hbar">
+                <div class="hbar-label"><span>수입</span><span>{{ total_income|intcomma }}원</span></div>
+                <div class="hbar-track"><div class="hbar-fill" style="width:{% widthratio total_income max_income_expense 100 %}%; background:#7C4DFF;"></div></div>
+            </div>
+            <div class="hbar">
+                <div class="hbar-label"><span>지출</span><span>{{ total_expense|intcomma }}원</span></div>
+                <div class="hbar-track"><div class="hbar-fill" style="width:{% widthratio total_expense max_income_expense 100 %}%; background:#EF5350;"></div></div>
+            </div>
+            <div class="pie-wrap" style="margin-top:10px;">
+                <div class="pie pie-sm" style="background:conic-gradient(#7C4DFF 0% {{ spending_rate }}%, #e0e0e0 {{ spending_rate }}% 100%);"></div>
+                <div class="legend">
+                    <div><span class="legend-dot" style="background:#7C4DFF;"></span>소비 {{ spending_rate }}%</div>
+                    <div><span class="legend-dot" style="background:#e0e0e0;"></span>잔여 {{ remaining_rate }}%</div>
+                </div>
+            </div>
+            <div class="stat-row"><span class="label">고정비</span><span class="val">{{ fixed_ratio }}%</span></div>
+            <div class="stat-row"><span class="label">변동비</span><span class="val">{{ variable_ratio }}%</span></div>
+        </div>
+    </div>
+
+    <!-- ② 저축 분석 -->
+    <div class="col-lg-4 col-md-6">
+        <div class="im-sec">
+            <div class="im-sec-title">2. 저축·잔여 자금</div>
+            <div class="stat-row"><span class="label">저축률</span><span class="val stat-big" style="color:{% if saving_rate > 20 %}#2e7d32{% elif saving_rate > 0 %}#f57f17{% else %}#c62828{% endif %};">{{ saving_rate }}%</span></div>
+            <div class="stat-row"><span class="label">저축 변동성</span><span class="val">{{ saving_volatility|intcomma }}원</span></div>
+            <div style="font-size:.65rem; color:#9e9e9e; margin-top:8px;">월별 저축 추이</div>
+            <div class="trend">
+                {% for m in monthly %}
+                <div class="trend-col">
+                    {% if m.saving >= 0 %}
+                    <div class="trend-bar" style="background:#7C4DFF; height:{% widthratio m.saving_abs max_monthly_saving_abs 100 %}%;" title="{{ m.label }}: {{ m.saving|intcomma }}원"></div>
+                    {% else %}
+                    <div class="trend-bar" style="background:#EF5350; height:{% widthratio m.saving_abs max_monthly_saving_abs 100 %}%;" title="{{ m.label }}: {{ m.saving|intcomma }}원"></div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="trend-labels">
+                {% for m in monthly %}<span>{{ m.mm }}</span>{% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ③ 현금 체력 -->
+    <div class="col-lg-4 col-md-6">
+        <div class="im-sec">
+            <div class="im-sec-title">3. 현금 체력 (유동성)</div>
+            <div class="stat-row"><span class="label">금융자산 합계</span><span class="val">{{ total_assets|intcomma }}원</span></div>
+            <div class="stat-row"><span class="label">월 평균 지출</span><span class="val">{{ avg_monthly_expense|intcomma }}원</span></div>
+            <div style="text-align:center; margin:12px 0;">
+                <div class="stat-big" style="color:{% if cash_endurance_months >= 6 %}#2e7d32{% elif cash_endurance_months >= 3 %}#f57f17{% else %}#c62828{% endif %};">{{ cash_endurance_months }}개월</div>
+                <div style="font-size:.72rem; color:#757575;">버틸 수 있는 기간</div>
+            </div>
+            <div style="font-size:.78rem; color:#757575; text-align:center; margin-top:4px;">
+                {% if cash_endurance_months >= 6 %}안정 구간{% elif cash_endurance_months >= 3 %}주의 구간{% elif cash_endurance_months >= 1 %}경고 구간{% else %}위험 구간{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ④ 소비 패턴 -->
+    <div class="col-lg-4 col-md-6">
+        <div class="im-sec">
+            <div class="im-sec-title">4. 소비 패턴·리듬</div>
+            <div class="stat-row"><span class="label">소비 변동성</span><span class="val">{{ expense_volatility|intcomma }}원</span></div>
+            <div class="pie-wrap">
+                <div class="pie pie-sm" style="background:conic-gradient(#7C4DFF 0% {{ early_ratio }}%, #ff9800 {{ early_ratio }}% 100%);"></div>
+                <div class="legend">
+                    <div><span class="legend-dot" style="background:#7C4DFF;"></span>월초 1~15일 {{ early_ratio }}%</div>
+                    <div><span class="legend-dot" style="background:#ff9800;"></span>월말 16일~ {{ late_ratio }}%</div>
+                </div>
+            </div>
+            <div style="font-size:.65rem; color:#9e9e9e; margin-top:6px;">월별 지출 추이</div>
+            <div class="trend">
+                {% for m in monthly %}
+                <div class="trend-col">
+                    <div class="trend-bar" style="background:#EF5350; height:{% widthratio m.expense max_monthly_expense 100 %}%;" title="{{ m.label }}: {{ m.expense|intcomma }}원"></div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="trend-labels">
+                {% for m in monthly %}<span>{{ m.mm }}</span>{% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ⑤ 카테고리 소비 -->
+    <div class="col-lg-4 col-md-6">
+        <div class="im-sec">
+            <div class="im-sec-title">5. 카테고리 소비</div>
+            <div class="pie-wrap">
+                {% if category_pie_data %}
+                <div class="pie" style="background:conic-gradient({% for c in category_pie_data %}{{ c.color }} {{ c.start }}% {{ c.end }}%{% if not forloop.last %}, {% endif %}{% endfor %});"></div>
+                <div class="legend">
+                    {% for c in category_pie_data %}
+                    <div><span class="legend-dot" style="background:{{ c.color }};"></span>{{ c.label }} {{ c.pct }}%</div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="color:#9e9e9e;">데이터 없음</div>
+                {% endif %}
+            </div>
+            {% for cat in top_categories %}
+            <div class="hbar">
+                <div class="hbar-label"><span>{{ cat.category__name }}</span><span>{{ cat.total|intcomma }}원</span></div>
+                <div class="hbar-track"><div class="hbar-fill" style="width:{% widthratio cat.total max_top_category 100 %}%;
+                    {% if forloop.counter == 1 %}background:#7C4DFF;{% elif forloop.counter == 2 %}background:#EF5350;{% elif forloop.counter == 3 %}background:#66BB6A;{% elif forloop.counter == 4 %}background:#FFA726;{% else %}background:#9b59b6;{% endif %}
+                "></div></div>
+            </div>
+            {% empty %}
+            <div style="color:#9e9e9e; font-size:.72rem;">데이터 없음</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ⑥ 만족 소비 -->
+    <div class="col-lg-4 col-md-6">
+        <div class="im-sec">
+            <div class="im-sec-title">6. 만족 소비</div>
+            <div style="font-size:.7rem; color:#9e9e9e; margin-bottom:6px;">카페/간식, 문화생활, 유흥, 자기계발, 쇼핑 카테고리의 지출입니다.</div>
+            <div class="stat-row"><span class="label">만족 소비 금액</span><span class="val">{{ satisfaction_expense|intcomma }}원</span></div>
+            <div class="pie-wrap">
+                <div class="pie pie-sm" style="background:conic-gradient(#43a047 0% {{ satisfaction_ratio }}%, #e0e0e0 {{ satisfaction_ratio }}% 100%);"></div>
+                <div class="legend">
+                    <div><span class="legend-dot" style="background:#43a047;"></span>만족 소비 {{ satisfaction_ratio }}%</div>
+                    <div><span class="legend-dot" style="background:#e0e0e0;"></span>기타 {{ satisfaction_remaining }}%</div>
+                </div>
+            </div>
+            <div style="font-size:.65rem; color:#9e9e9e; margin-top:6px;">월별 만족 소비 추이</div>
+            <div class="trend">
+                {% for m in satisfaction_monthly %}
+                <div class="trend-col">
+                    <div class="trend-bar" style="background:#43a047; height:{% widthratio m.amount max_satisfaction 100 %}%;" title="{{ m.label }}: {{ m.amount|intcomma }}원"></div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="trend-labels">
+                {% for m in satisfaction_monthly %}<span>{{ m.mm }}</span>{% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ⑦ 월별 수입/지출 비교 (전체 너비) -->
+    <div class="col-12">
+        <div class="im-sec">
+            <div class="im-sec-title">7. 월별 수입/지출 비교</div>
+            <div style="display:flex; gap:16px; align-items:center;">
+                <div style="flex:1;">
+                    <div class="trend-dual">
+                        {% for m in monthly %}
+                        <div class="trend-pair">
+                            <div style="background:#7C4DFF; height:{% widthratio m.income max_monthly_compare 100 %}%;" title="{{ m.label }} 수입: {{ m.income|intcomma }}원"></div>
+                            <div style="background:#EF5350; height:{% widthratio m.expense max_monthly_compare 100 %}%;" title="{{ m.label }} 지출: {{ m.expense|intcomma }}원"></div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="trend-labels">
+                        {% for m in monthly %}<span>{{ m.mm }}</span>{% endfor %}
+                    </div>
+                </div>
+                <div class="legend" style="flex-shrink:0;">
+                    <div><span class="legend-dot" style="background:#7C4DFF;"></span>수입</div>
+                    <div><span class="legend-dot" style="background:#EF5350;"></span>지출</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⑧ 계좌 관리 -->
+    <div class="col-lg-6">
+        <div class="im-sec">
+            <div class="im-sec-title">8. 계좌 관리</div>
+            <div style="font-size:.65rem; color:#9e9e9e;">계좌별 잔액</div>
+            {% for a in account_balances %}
+            <div class="hbar">
+                <div class="hbar-label"><span>{{ a.name }}</span><span>{{ a.balance|intcomma }}원</span></div>
+                <div class="hbar-track"><div class="hbar-fill" style="width:{% widthratio a.balance max_account_balance 100 %}%; background:#7C4DFF;"></div></div>
+            </div>
+            {% empty %}
+            <div style="color:#9e9e9e; font-size:.72rem;">데이터 없음</div>
+            {% endfor %}
+            <div style="font-size:.65rem; color:#9e9e9e; margin-top:10px;">계좌별 지출</div>
+            {% for a in account_expense_data %}
+            <div class="hbar">
+                <div class="hbar-label"><span>{{ a.account__name }}</span><span>{{ a.total|intcomma }}원</span></div>
+                <div class="hbar-track"><div class="hbar-fill" style="width:{% widthratio a.total max_account_expense 100 %}%; background:#EF5350;"></div></div>
+            </div>
+            {% empty %}
+            <div style="color:#9e9e9e; font-size:.72rem;">데이터 없음</div>
+            {% endfor %}
+            <div style="font-size:.65rem; color:#9e9e9e; margin-top:10px;">입출금 빈도</div>
+            {% for name, freq in account_freq.items %}
+            <div class="stat-row"><span class="label">{{ name }}</span><span class="val">{{ freq }}회</span></div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ⑨ 습관·행동 -->
+    <div class="col-lg-6">
+        <div class="im-sec">
+            <div class="im-sec-title">9. 습관·행동 지표</div>
+            <div class="stat-row"><span class="label">충동 소비 비율</span><span class="val" style="color:{% if impulse_ratio > 30 %}#c62828{% elif impulse_ratio > 15 %}#f57f17{% else %}#2e7d32{% endif %};">{{ impulse_ratio }}%</span></div>
+            <div class="stat-row"><span class="label">소액 지출 건수</span><span class="val">{{ small_spending_count }}건</span></div>
+            <div class="stat-row"><span class="label">소액 지출 누적</span><span class="val">{{ small_spending_total|intcomma }}원</span></div>
+            {% if repeat_spending %}
+            <div style="font-size:.65rem; color:#9e9e9e; margin-top:8px;">반복 지출 (3회+)</div>
+            {% for item in repeat_spending %}
+            <div class="stat-row"><span class="label">{{ item.merchant }}</span><span class="val">{{ item.amount|intcomma }}원 x{{ item.count }}</span></div>
+            {% endfor %}
+            {% endif %}
+            <div style="font-size:.65rem; color:#9e9e9e; margin-top:8px;">소액 지출 월별 추이</div>
+            <div class="trend">
+                {% for m in small_monthly %}
+                <div class="trend-col">
+                    <div class="trend-bar" style="background:#ff9800; height:{% widthratio m.amount max_small 100 %}%;" title="{{ m.label }}: {{ m.amount|intcomma }}원"></div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="trend-labels">
+                {% for m in small_monthly %}<span>{{ m.mm }}</span>{% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ⑩ 시간 기반 분석 (전체 너비) -->
+    <div class="col-12">
+        <div class="im-sec">
+            <div class="im-sec-title">10. 시간 기반 분석</div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div style="font-size:.65rem; color:#9e9e9e;">분기별 지출</div>
+                    {% for q in quarterly_data_list %}
+                    <div class="hbar">
+                        <div class="hbar-label"><span>{{ q.label }}</span><span>{{ q.value|intcomma }}원</span></div>
+                        <div class="hbar-track"><div class="hbar-fill" style="width:{% widthratio q.value max_quarterly 100 %}%; background:#7b1fa2;"></div></div>
+                    </div>
+                    {% empty %}
+                    <div style="color:#9e9e9e; font-size:.72rem;">데이터 없음</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <div style="font-size:.65rem; color:#9e9e9e;">월별 지출 변화율</div>
+                    {% for item in change_rates %}
+                    <div class="stat-row">
+                        <span class="label">{{ item.label }}</span>
+                        <span class="val" style="color:{% if item.rate > 0 %}#c62828{% elif item.rate < 0 %}#2e7d32{% else %}#757575{% endif %};">
+                            {% if item.rate > 0 %}+{% endif %}{{ item.rate }}%
+                        </span>
+                    </div>
+                    {% empty %}
+                    <div style="color:#9e9e9e; font-size:.72rem;">데이터 부족</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⑪ 안정성·위험 신호 -->
+    <div class="col-lg-6">
+        <div class="im-sec">
+            <div class="im-sec-title">11. 안정성·위험 신호</div>
+            {% if warnings %}
+            <ul class="warn-list">
+                {% for w in warnings %}
+                <li>{{ w }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="warn-ok">위험 신호가 감지되지 않았습니다.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ⑫ 목표 관리 -->
+    <div class="col-lg-6">
+        <div class="im-sec">
+            <div class="im-sec-title">12. 목표 관리</div>
+            {% if goal %}
+            <div class="stat-row"><span class="label">목표 저축</span><span class="val">{{ goal.target_saving|intcomma }}원</span></div>
+            <div class="stat-row"><span class="label">월 목표 소비</span><span class="val">{{ goal.monthly_spending_limit|intcomma }}원</span></div>
+            <div class="prog-wrap">
+                <div class="prog-label"><span>저축 달성률</span><span>{{ saving_achievement }}%</span></div>
+                <div class="prog-track"><div class="prog-fill" style="width:{% if saving_achievement > 100 %}100{% else %}{{ saving_achievement }}{% endif %}%; background:#43a047;"></div></div>
+            </div>
+            <div class="prog-wrap">
+                <div class="prog-label"><span>소비 사용률</span><span style="color:{% if spending_usage > 100 %}#c62828{% elif spending_usage > 80 %}#f57f17{% else %}#2e7d32{% endif %};">{{ spending_usage }}%</span></div>
+                <div class="prog-track"><div class="prog-fill" style="width:{% if spending_usage > 100 %}100{% else %}{{ spending_usage }}{% endif %}%; background:{% if spending_usage > 100 %}#EF5350{% elif spending_usage > 80 %}#ff9800{% else %}#43a047{% endif %};"></div></div>
+            </div>
+            {% else %}
+            <div style="color:#9e9e9e; font-size:.72rem;">목표가 설정되지 않았습니다.</div>
+            {% endif %}
+            <div style="margin-top:8px;"><a href="{% url 'goal_update' %}" class="text-decoration-none" style="font-size:.75rem; color:#5E35B1;">목표 설정/수정 &rarr;</a></div>
+        </div>
+    </div>
+
+    <!-- 종합 요약 (전체 너비) -->
+    <div class="col-12">
+        <div class="im-sec">
+            <div class="im-sec-title">종합 요약</div>
+            <div class="im-summary-grid">
+                <div class="im-summary-item">
+                    <div class="val" style="color:{{ score_color }};">{{ financial_score }}<span style="font-size:.75rem;">/100</span></div>
+                    <div class="desc">재무 건강 점수</div>
+                </div>
+                <div class="im-summary-item">
+                    <div class="val">{{ hhi }}</div>
+                    <div class="desc">소비 집중도 (HHI)</div>
+                </div>
+                <div class="im-summary-item">
+                    <div class="val" style="color:{% if balance_index > 0 %}#2e7d32{% else %}#c62828{% endif %};">{{ balance_index }}</div>
+                    <div class="desc">소비-저축 밸런스</div>
+                </div>
+            </div>
+            <div style="text-align:center; margin-top:6px; font-size:.85rem; font-weight:600; color:#424242;">
+                {% if financial_score >= 80 %}
+                    재무 상태: 우수
+                {% elif financial_score >= 60 %}
+                    재무 상태: 양호
+                {% elif financial_score >= 40 %}
+                    재무 상태: 보통
+                {% else %}
+                    재무 상태: 주의 필요
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 푸터 -->
+<div class="im-footer mt-3">
+    InMoney &mdash; 재무 건강 진단 &copy; {{ today.year }}
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- GPT 최종 분석 -->
+<!-- ══════════════════════════════════════ -->
+<div class="im-gpt fade-in-up delay-3">
+    <!-- 헤더 영역 -->
+    <div class="im-gpt-header">
+        <div class="im-gpt-icon">
+            <i class="bi bi-stars"></i>
+        </div>
+        <div>
+            <h2>AI 최종 분석</h2>
+            <p class="im-gpt-desc">위 리포트 데이터를 기반으로 AI가 재무 건강 진단서를 작성합니다.</p>
+        </div>
+    </div>
+
+    <!-- 분석 버튼 -->
+    <button id="gptAnalysisBtn" class="im-gpt-btn press-effect" onclick="requestGptAnalysis()">
+        <i class="bi bi-lightning-charge-fill me-1"></i>최종 분석
+    </button>
+
+    <!-- 로딩 상태 -->
+    <div id="gptAnalysisLoading" style="display:none;" class="im-gpt-loading">
+        <div class="im-gpt-loading-text">
+            <div class="im-gpt-spinner"></div>
+            <span>AI가 분석 중입니다... 잠시만 기다려주세요.</span>
+        </div>
+        <div class="im-gpt-loading-bar">
+            <div class="im-gpt-loading-fill"></div>
+        </div>
+    </div>
+
+    <!-- 분석 결과 -->
+    <div id="gptAnalysisResult" style="display:none;" class="im-gpt-result">
+        <div class="im-gpt-result-header">
+            <i class="bi bi-check-circle-fill me-1"></i>분석 완료
+        </div>
+        <div class="im-gpt-result-body"></div>
+    </div>
+
+    <!-- 에러 -->
+    <div id="gptAnalysisError" style="display:none;" class="im-gpt-error">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+        <span></span>
+    </div>
+</div>
+
+<script>
+function requestGptAnalysis() {
+    const btn = document.getElementById('gptAnalysisBtn');
+    const loading = document.getElementById('gptAnalysisLoading');
+    const result = document.getElementById('gptAnalysisResult');
+    const resultBody = result.querySelector('.im-gpt-result-body');
+    const error = document.getElementById('gptAnalysisError');
+    const errorSpan = error.querySelector('span');
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>분석 중...';
+    loading.style.display = 'block';
+    result.style.display = 'none';
+    error.style.display = 'none';
+
+    fetch("{% url 'gpt_analysis' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        loading.style.display = 'none';
+        if (data.status === 'ok') {
+            resultBody.textContent = data.analysis;
+            result.style.display = 'block';
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>다시 분석';
+        } else {
+            errorSpan.textContent = '분석 중 오류가 발생했습니다: ' + (data.message || '알 수 없는 오류');
+            error.style.display = 'flex';
+            btn.innerHTML = '<i class="bi bi-lightning-charge-fill me-1"></i>최종 분석';
+        }
+        btn.disabled = false;
+    })
+    .catch(err => {
+        loading.style.display = 'none';
+        errorSpan.textContent = '네트워크 오류가 발생했습니다: ' + err.message;
+        error.style.display = 'flex';
+        btn.innerHTML = '<i class="bi bi-lightning-charge-fill me-1"></i>최종 분석';
+        btn.disabled = false;
+    });
+}
+</script>
+{% endblock %}

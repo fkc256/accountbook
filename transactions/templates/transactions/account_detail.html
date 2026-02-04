@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}계좌 상세{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <!-- 계좌 정보 카드 -->
+    <div class="col-lg-4 fade-in-up delay-1">
+        <div class="card">
+            <div class="card-header page-title">{{ account.name }}</div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tr><th class="text-secondary" style="width:40%">은행</th><td>{{ account.bank_name }}</td></tr>
+                    <tr><th class="text-secondary">계좌번호</th><td>{{ account.masked_account_number }}</td></tr>
+                    <tr><th class="text-secondary">잔액</th><td class="fw-bold">{{ account.balance|intcomma }}원</td></tr>
+                    <tr><th class="text-secondary">상태</th><td>
+                        {% if account.is_active %}
+                        <span class="badge bg-success-subtle text-success rounded-pill">활성</span>
+                        {% else %}
+                        <span class="badge bg-secondary-subtle text-secondary rounded-pill">비활성</span>
+                        {% endif %}
+                    </td></tr>
+                    <tr><th class="text-secondary">등록일</th><td>{{ account.created_at }}</td></tr>
+                </table>
+                <div class="d-flex gap-2 mt-3">
+                    <a href="{% url 'account_update' account.pk %}" class="btn btn-primary btn-sm">수정</a>
+                    <a href="{% url 'account_delete' account.pk %}" class="btn btn-outline-secondary btn-sm">삭제</a>
+                    <a href="{% url 'account_list' %}" class="btn btn-outline-secondary btn-sm ms-auto">목록으로</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 거래 내역 카드 -->
+    <div class="col-lg-8 fade-in-up delay-2">
+        <div class="card">
+            <div class="card-header page-title">거래 내역</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>거래일</th>
+                                <th>구분</th>
+                                <th class="text-end">금액</th>
+                                <th>카테고리</th>
+                                <th class="text-end">거래 후 잔액</th>
+                                <th>메모</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for tx in transactions %}
+                            <tr>
+                                <td>{{ tx.occurred_at }}</td>
+                                <td>
+                                    {% if tx.get_tx_type_display == "입금" %}
+                                    <span class="badge bg-success-subtle text-success rounded-pill">입금</span>
+                                    {% else %}
+                                    <span class="badge bg-danger-subtle text-danger rounded-pill">출금</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end fw-semibold {% if tx.get_tx_type_display == '입금' %}text-amount-in{% else %}text-amount-out{% endif %}">{{ tx.amount|intcomma }}원</td>
+                                <td>{{ tx.category|default:"-" }}</td>
+                                <td class="text-end">{% if tx.balance_after is not None %}{{ tx.balance_after|intcomma }}원{% else %}-{% endif %}</td>
+                                <td><a href="{% url 'transaction_detail' tx.pk %}" class="text-decoration-none">{{ tx.memo|default:"(상세)" }}</a></td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="6" class="text-center text-secondary py-4">거래 내역이 없습니다.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

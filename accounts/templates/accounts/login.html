@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}로그인{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+    <div class="card auth-card fade-in-up">
+        <div class="card-body">
+            <h2>로그인</h2>
+            {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="username" class="form-label">아이디</label>
+                    <input type="text" name="username" id="username" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">비밀번호</label>
+                    <input type="password" name="password" id="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mb-3 press-effect">로그인</button>
+            </form>
+            <p class="text-center mb-0"><a href="{% url 'signup' %}" class="text-decoration-none">회원가입</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

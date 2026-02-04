@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}정기 거래 {% if form.instance.pk %}수정{% else %}등록{% endif %}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header page-title">정기 거래 {% if form.instance.pk %}수정{% else %}등록{% endif %}</div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary">저장</button>
+                        <a href="{% url 'recurring_list' %}" class="btn btn-outline-secondary">취소</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+# 환경 설정
+.env
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Django
+db.sqlite3
+dump.json
+media/
+staticfiles/
+
+# 로그
+*.log
+
+# 교재/개인 메모
+2project.md
+
+# IDE / 도구
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo

@@ -1,0 +1,555 @@
+/* ===== Design Tokens ===== */
+:root {
+    /* 딥퍼플/인디고 팔레트 */
+    --primary: #5E35B1;
+    --primary-hover: #4527A0;
+    --primary-light: rgba(94, 53, 177, .08);
+    --primary-glow: rgba(94, 53, 177, .18);
+    --accent: #7C4DFF;
+    --danger: #EF5350;
+    --danger-hover: #D32F2F;
+    --success: #66BB6A;
+    --warning: #FFA726;
+    --bg: #F4F2F7;
+    --surface: #FFFFFF;
+    --text-primary: #1A1225;
+    --text-secondary: #6E6480;
+    --text-tertiary: #9E95AD;
+    --border: #E8E4EF;
+    --radius: 16px;
+    --radius-sm: 12px;
+    --shadow: 0 1px 3px rgba(30, 10, 60, .06), 0 1px 2px rgba(30, 10, 60, .04);
+    --shadow-md: 0 4px 16px rgba(30, 10, 60, .10);
+    --transition: .2s ease;
+}
+
+/* ===== Base ===== */
+body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Navbar ===== */
+.navbar {
+    background: linear-gradient(135deg, #311B92 0%, #4527A0 100%) !important;
+    border-bottom: none;
+    box-shadow: 0 2px 12px rgba(49, 27, 146, .25);
+}
+.navbar-brand {
+    font-weight: 700;
+    color: #fff !important;
+    font-size: 1.25rem;
+    letter-spacing: -.02em;
+}
+.nav-link {
+    color: rgba(255,255,255,.7) !important;
+    font-weight: 500;
+    font-size: .9rem;
+    padding: .5rem .75rem !important;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    position: relative;
+}
+.nav-link:hover, .nav-link.active {
+    color: #fff !important;
+    background: rgba(255,255,255,.12);
+}
+.nav-link::after {
+    content: '';
+    display: block;
+    height: 2px;
+    background: #7C4DFF;
+    transform: scaleX(0);
+    transition: transform .2s ease;
+}
+.nav-link:hover::after, .nav-link.active::after {
+    transform: scaleX(1);
+}
+.navbar-text {
+    color: rgba(255,255,255,.9) !important;
+    font-weight: 600;
+    font-size: .9rem;
+}
+.navbar .btn-outline-secondary {
+    color: rgba(255,255,255,.8);
+    border-color: rgba(255,255,255,.3);
+}
+.navbar .btn-outline-secondary:hover {
+    background: rgba(255,255,255,.15);
+    border-color: rgba(255,255,255,.5);
+    color: #fff;
+}
+.navbar-toggler {
+    border-color: rgba(255,255,255,.3) !important;
+}
+.navbar-toggler-icon {
+    filter: invert(1);
+}
+
+/* ===== Cards ===== */
+.card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: box-shadow var(--transition);
+}
+.card:hover {
+    box-shadow: var(--shadow-md);
+}
+.card-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+.card-body {
+    padding: 1.5rem;
+}
+
+/* ===== Tables ===== */
+.table {
+    margin-bottom: 0;
+    font-size: .9rem;
+}
+.table thead th {
+    background: #f8f6fb;
+    border-bottom: 2px solid var(--border);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: .75rem 1rem;
+    white-space: nowrap;
+}
+.table tbody td {
+    padding: .75rem 1rem;
+    vertical-align: middle;
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+.table-hover tbody tr:hover {
+    background: rgba(94, 53, 177, .03);
+}
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ===== Forms ===== */
+.form-control, .form-select {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .65rem 1rem;
+    font-size: .9rem;
+    transition: var(--transition);
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.form-label {
+    font-weight: 600;
+    font-size: .85rem;
+    color: var(--text-secondary);
+    margin-bottom: .35rem;
+}
+
+/* ===== Buttons ===== */
+.btn {
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: .9rem;
+    padding: .55rem 1.25rem;
+    transition: var(--transition);
+}
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    border-color: var(--primary);
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary) 100%);
+    border-color: var(--primary-hover);
+}
+.btn-danger {
+    background: var(--danger);
+    border-color: var(--danger);
+}
+.btn-danger:hover {
+    background: var(--danger-hover);
+    border-color: var(--danger-hover);
+}
+.btn-outline-secondary {
+    color: var(--text-secondary);
+    border-color: var(--border);
+}
+.btn-outline-secondary:hover {
+    background: var(--bg);
+    border-color: var(--text-tertiary);
+    color: var(--text-primary);
+}
+
+/* ===== Badges ===== */
+.badge {
+    font-weight: 600;
+    font-size: .75rem;
+    padding: .35em .7em;
+}
+
+/* ===== Alerts ===== */
+.alert {
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: .9rem;
+}
+
+/* ===== Summary Cards (Dashboard) ===== */
+.summary-card {
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--primary);
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+.summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+.summary-card .label {
+    font-size: .8rem;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    margin-bottom: .25rem;
+}
+.summary-card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -.02em;
+}
+.summary-card .value.income { color: var(--primary); }
+.summary-card .value.expense { color: var(--danger); }
+.summary-card .value.net { color: var(--success); }
+
+/* ===== Progress Bars ===== */
+.progress {
+    height: 10px;
+    border-radius: 8px;
+    background: var(--bg);
+}
+.progress-bar {
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+}
+
+/* ===== Auth Pages ===== */
+.auth-wrapper {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    border: none;
+    border-top: 4px solid var(--primary);
+}
+.auth-card .card-body {
+    padding: 2.5rem;
+}
+.auth-card h2 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+}
+
+/* ===== Page Title ===== */
+.page-title {
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: -.02em;
+}
+
+/* ===== Misc ===== */
+.text-amount-in { color: var(--primary); font-weight: 600; }
+.text-amount-out { color: var(--danger); font-weight: 600; }
+a.text-decoration-none:hover { opacity: .8; }
+.opacity-50 { opacity: .5; }
+
+/* ===== Filter Card ===== */
+.filter-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* ===== Django form as_p override ===== */
+.card-body p {
+    margin-bottom: .75rem;
+}
+.card-body p label {
+    display: block;
+    font-weight: 600;
+    font-size: .85rem;
+    color: var(--text-secondary);
+    margin-bottom: .35rem;
+}
+.card-body p input[type="text"],
+.card-body p input[type="number"],
+.card-body p input[type="password"],
+.card-body p input[type="email"],
+.card-body p input[type="date"],
+.card-body p input[type="file"],
+.card-body p textarea,
+.card-body p select {
+    display: block;
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .65rem 1rem;
+    font-size: .9rem;
+    transition: var(--transition);
+    background: var(--surface);
+}
+.card-body p input:focus,
+.card-body p textarea:focus,
+.card-body p select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.card-body p .helptext,
+.card-body p ul {
+    font-size: .8rem;
+    color: var(--text-tertiary);
+    margin-top: .25rem;
+}
+
+/* ==========================================================
+   ===== CSS 애니메이션 & 홈 페이지 스타일 =====
+
+   CSS 애니메이션 핵심 개념 정리:
+
+   1. @keyframes — 애니메이션의 시작(from/0%)과 끝(to/100%) 상태를 정의
+      예: @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+   2. animation 속성 — @keyframes를 요소에 적용
+      - animation-name       : 사용할 @keyframes 이름
+      - animation-duration   : 재생 시간 (예: 0.6s)
+      - animation-fill-mode  : 끝난 후 상태 유지 여부
+        → forwards : 마지막 프레임 상태를 유지
+        → backwards: 시작 전에 첫 프레임 상태를 적용
+        → both     : 둘 다 적용
+      - animation-delay      : 시작 전 대기 시간 (예: 0.1s)
+
+   3. transition — 속성 값이 바뀔 때 부드럽게 변화
+      예: transition: transform 0.2s ease;
+      → transform 속성이 바뀌면 0.2초에 걸쳐 부드럽게 변한다
+
+   4. transform — 요소를 이동/크기 변경/회전
+      - translateY(-4px) : Y축으로 위로 4px 이동 (떠오르는 효과)
+      - scale(0.97)      : 97% 크기로 줄임 (눌리는 효과)
+
+   5. ease / ease-out / cubic-bezier — 가속/감속 곡선
+      - ease     : 천천히→빠르게→천천히 (가장 자연스러운 기본값)
+      - ease-out : 빠르게 시작→천천히 끝남 (자연스러운 감속)
+      - cubic-bezier(0.34, 1.56, 0.64, 1) : 커스텀 곡선 (살짝 통통 튀는 느낌)
+   ========================================================== */
+
+/* ----- @keyframes 정의 -----
+   fadeInUp: 아래에서 위로 올라오며 서서히 나타나는 효과
+   - 시작(from): 투명(opacity:0) + 아래로 24px 이동
+   - 끝(to):     불투명(opacity:1) + 원래 위치
+*/
+@keyframes fadeInUp {
+    from {
+        opacity: 0;                    /* 완전히 투명 */
+        transform: translateY(24px);   /* 아래에서 24px 위치에서 시작 */
+    }
+    to {
+        opacity: 1;                    /* 완전히 불투명 */
+        transform: translateY(0);      /* 원래 위치로 이동 */
+    }
+}
+
+/* ----- 페이드인 클래스 -----
+   HTML 요소에 class="fade-in-up" 을 붙이면 자동으로 애니메이션 적용.
+   animation-fill-mode: both 로 시작 전(투명)과 끝난 후(불투명) 상태 모두 유지.
+*/
+.fade-in-up {
+    animation: fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    /* cubic-bezier(0.34, 1.56, 0.64, 1) → 살짝 바운스(통통) 느낌의 커브 */
+}
+
+/* ----- 딜레이 클래스 -----
+   카드가 순서대로 하나씩 나타나도록 시간차(delay)를 준다.
+   delay-1 → 0.1초 후 시작, delay-2 → 0.2초 후 시작 ...
+   → 여러 카드가 "파도처럼" 순서대로 나타나는 효과
+*/
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+
+/* ----- iPhone 스타일 버튼 클릭 효과 (press-effect) -----
+
+   원리: 버튼을 누르면(:active) scale(0.97)로 살짝 줄어들어서
+   실제로 "눌리는 느낌"을 준다. 손 떼면 원래 크기로 돌아온다.
+
+   transition에 cubic-bezier 를 사용해서 탄성 있는 복원 느낌.
+*/
+.press-effect {
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.15s ease;
+    /* transform 변화 시 0.15초에 걸쳐 바운스 곡선으로 부드럽게 */
+}
+
+.press-effect:active {
+    transform: scale(0.97);  /* 누르는 순간 97% 크기로 줄어듦 (눌리는 느낌) */
+    box-shadow: none;        /* 그림자 제거로 "안쪽으로 눌린" 느낌 강조 */
+}
+
+/* ----- 홈 화면 전체 래퍼 -----
+   min-height + flexbox 로 화면 중앙에 콘텐츠를 배치한다.
+   calc(100vh - 72px) 에서 72px 은 상단 네비바 높이.
+*/
+.home-wrapper {
+    min-height: calc(100vh - 72px);  /* 네비바 제외한 전체 높이 */
+    display: flex;
+    flex-direction: column;           /* 세로 정렬 */
+    align-items: center;              /* 가로 중앙 */
+    justify-content: center;          /* 세로 중앙 */
+    padding: 2rem 1rem;
+}
+
+/* ----- 히어로 타이틀 -----
+   큰 글씨로 웹 이름을 보여주는 영역.
+   letter-spacing 으로 자간을 좁혀 세련된 느낌.
+*/
+.home-hero {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+/* 메인 타이틀 — 크고 굵게, 퍼플 그라데이션 텍스트 */
+.home-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    letter-spacing: -.04em;
+    /* background + -webkit-background-clip: text 로 글자에 그라데이션 적용 */
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;    /* 배경을 텍스트 모양으로 자름 */
+    -webkit-text-fill-color: transparent; /* 원래 글자색을 투명으로 → 배경 그라데이션이 보임 */
+    background-clip: text;
+}
+
+/* 서브타이틀 */
+.home-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    margin-top: .5rem;
+}
+
+/* ----- 메뉴 아이콘 그리드 -----
+   CSS Grid 로 3열 배치. gap 으로 카드 간격 설정.
+   max-width 로 너무 넓어지지 않게 제한.
+*/
+.home-menu {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);  /* 3열 균등 배치 */
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 480px;                        /* 최대 너비 제한 */
+}
+
+/* ----- 개별 메뉴 아이템 -----
+   세로 정렬 카드. hover 시 떠오르는 효과.
+*/
+.home-menu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .75rem;
+    padding: 1.5rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* hover: 위로 떠오르며 그림자 확대 */
+.home-menu-item:hover {
+    transform: translateY(-6px);      /* 위로 6px 이동 */
+    box-shadow: var(--shadow-md);
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+/* ----- 큰 아이콘 원형 배경 ----- */
+.home-icon {
+    width: 72px;                      /* 큰 원형 */
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;                  /* 아이콘 크기 */
+    transition: transform 0.2s ease;
+}
+
+/* hover 시 아이콘 확대 효과 */
+.home-menu-item:hover .home-icon {
+    transform: scale(1.12);
+}
+
+/* 메뉴 라벨 */
+.home-menu-label {
+    font-weight: 600;
+    font-size: .9rem;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .card-header {
+        padding: 1rem 1.25rem;
+    }
+    .card-body {
+        padding: 1.25rem;
+    }
+    .summary-card .value {
+        font-size: 1.25rem;
+    }
+    /* 홈 화면 모바일 대응 */
+    .home-title {
+        font-size: 2.5rem;    /* 모바일에서 타이틀 줄이기 */
+    }
+    .home-menu {
+        grid-template-columns: repeat(3, 1fr);  /* 모바일에서도 3열 유지 */
+        gap: .75rem;
+    }
+    .home-icon {
+        width: 56px;           /* 모바일에서 아이콘 줄이기 */
+        height: 56px;
+        font-size: 1.5rem;
+    }
+    .home-menu-item {
+        padding: 1rem .75rem;
+    }
+    .home-menu-label {
+        font-size: .8rem;
+    }
+}

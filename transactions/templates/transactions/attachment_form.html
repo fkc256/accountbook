@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}영수증 업로드{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header page-title">영수증 업로드</div>
+            <div class="card-body">
+                <p class="text-secondary mb-3">거래: {{ tx.occurred_at }} | {{ tx.get_tx_type_display }} {{ tx.amount }}</p>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary">업로드</button>
+                        <a href="{% url 'transaction_detail' tx.pk %}" class="btn btn-outline-secondary">취소</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

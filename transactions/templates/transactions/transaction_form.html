@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}거래 {% if form.instance.pk %}수정{% else %}등록{% endif %}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        {% if balance_warning %}
+        <div class="alert alert-danger d-flex align-items-start mb-3">
+            <strong class="me-2">경고:</strong>
+            <span>{{ balance_warning }}<br>그래도 저장하시겠습니까?</span>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header page-title">거래 {% if form.instance.pk %}수정{% else %}등록{% endif %}</div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    {% if balance_warning %}
+                        <input type="hidden" name="confirm" value="1">
+                        <div class="d-flex gap-2 mt-3">
+                            <button type="submit" class="btn btn-danger">잔액 부족 - 그래도 저장</button>
+                            <a href="{% url 'transaction_list' %}" class="btn btn-outline-secondary">취소</a>
+                        </div>
+                    {% else %}
+                        <div class="d-flex gap-2 mt-3">
+                            <button type="submit" class="btn btn-primary">저장</button>
+                            <a href="{% url 'transaction_list' %}" class="btn btn-outline-secondary">취소</a>
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

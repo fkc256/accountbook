@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}거래 상세{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card mb-4 fade-in-up delay-1">
+            <div class="card-header page-title">거래 상세</div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tr><th class="text-secondary" style="width:30%">거래일</th><td>{{ tx.occurred_at }}</td></tr>
+                    <tr><th class="text-secondary">계좌</th><td>{{ tx.account.name }} ({{ tx.account.bank_name }})</td></tr>
+                    <tr><th class="text-secondary">구분</th><td>
+                        {% if tx.get_tx_type_display == "입금" %}
+                        <span class="badge bg-success-subtle text-success rounded-pill">입금</span>
+                        {% else %}
+                        <span class="badge bg-danger-subtle text-danger rounded-pill">출금</span>
+                        {% endif %}
+                    </td></tr>
+                    <tr><th class="text-secondary">금액</th><td class="fw-bold fs-5">{{ tx.amount|intcomma }}원</td></tr>
+                    <tr><th class="text-secondary">카테고리</th><td>{{ tx.category|default:"-" }}</td></tr>
+                    <tr><th class="text-secondary">가맹점</th><td>{{ tx.merchant|default:"-" }}</td></tr>
+                    <tr><th class="text-secondary">메모</th><td>{{ tx.memo|default:"-" }}</td></tr>
+                    <tr><th class="text-secondary">거래 후 잔액</th><td>{% if tx.balance_after is not None %}{{ tx.balance_after|intcomma }}원{% else %}-{% endif %}</td></tr>
+                    <tr><th class="text-secondary">등록일</th><td>{{ tx.created_at }}</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- 영수증 카드 -->
+        <div class="card mb-4 fade-in-up delay-2">
+            <div class="card-header page-title">영수증</div>
+            <div class="card-body">
+                {% if attachment %}
+                    <p class="mb-2">파일: <strong>{{ attachment.original_name }}</strong></p>
+                    <div class="d-flex gap-2">
+                        <a href="{{ attachment.file.url }}" class="btn btn-primary btn-sm">파일 보기/다운로드</a>
+                        <a href="{% url 'attachment_delete' tx.pk %}" class="btn btn-outline-secondary btn-sm">영수증 삭제</a>
+                    </div>
+                {% else %}
+                    <p class="text-secondary mb-2">첨부된 영수증이 없습니다.</p>
+                    <a href="{% url 'attachment_upload' tx.pk %}" class="btn btn-outline-secondary btn-sm">영수증 업로드</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="{% url 'transaction_update' tx.pk %}" class="btn btn-primary">수정</a>
+            <a href="{% url 'transaction_delete' tx.pk %}" class="btn btn-outline-secondary">삭제</a>
+            <a href="{% url 'transaction_list' %}" class="btn btn-outline-secondary ms-auto">목록으로</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
