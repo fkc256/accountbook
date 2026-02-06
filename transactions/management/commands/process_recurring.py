@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
         recurring_qs = RecurringTransaction.objects.filter(
             is_active=True,
-            recurring_day=day,
+            recurring_day__lte=day,  # 오늘 이전 날짜도 포함 (놓친 정기거래 처리)
             start_date__lte=today,
         ).select_related("account", "user")
 
